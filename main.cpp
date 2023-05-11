@@ -60,16 +60,14 @@ struct Foo
 int main()
 {
     Foo foo;
-    auto bar = foo.scopeLifetimeFunc(3, 1);        //3) 
+    auto bar = foo.scopeLifetimeFunc(3, 1);        //3)  
     
-    std::cout << "bar.num: " << bar.num << std::endl;     //4) 
+    std::cout << "bar.num: " << bar.num << std::endl;     //4)  
     return 0;
 }
 }
 
 //call Example::main() in main()
-
-
 
 
 
@@ -80,6 +78,7 @@ struct Television
     int numOfScreenModes;
     std::string televisionManufacturer = "Samsung";
     int numOfInputs;
+    int numOfChannels {200};
 
     Television();
 
@@ -87,6 +86,14 @@ struct Television
     void changeDisplaySettings();
     int decreaseBrightness(int nitOutput); // returns nit value --
     void printTelevisionVars();
+    int scanForChannels(int channelNumStart)
+    {
+        for(int i = channelNumStart; i < numOfChannels; ++i)
+        {
+            std::cout << "Discovered Channel: " << i << " \n";
+        }
+        return channelNumStart;
+    }
 };
 
 Television::Television() : 
@@ -165,8 +172,18 @@ struct MassageChair
 
     void giveMassage(bool startMassage);
     void playBackgroundSound(); 
-    double displayTimer(double msgDuration); // displays how much time is left on massage.
+    int displayTimer(int msgDuration); // displays how much time is left on massage.
     void printMassageChairVars();
+    bool startVibration(bool startMassage)
+    {
+        startMassage == false ? std::cout << "would you like to start a massage?\n" : std::cout <<  "starting\n";
+        while(startMassage == true)
+        {
+            --massageDuration;
+            massageDuration < 0.1 ? startMassage = false : startMassage = true;
+        }
+        return startMassage;
+    }  
 };
 
 MassageChair::MassageChair() :
@@ -182,7 +199,10 @@ void MassageChair::giveMassage(bool startMassage)
     {
         std::cout << "Please remove shoes, and relax!!\n";
     }
-    std::cout << "No Massage For You!\n";
+    else
+    {
+        std::cout << "No Massage For You!\n";
+    }
 }
 
 void MassageChair::playBackgroundSound()
@@ -190,9 +210,32 @@ void MassageChair::playBackgroundSound()
     std::cout << "Now playing! \n";
 }
 
-double MassageChair::displayTimer(double msgDuration)
+int MassageChair::displayTimer(int msgDuration)
 {
     std::cout << "now counting down from " << msgDuration << "minuntes\n";
+    int secs = 60, mins = msgDuration;
+    
+    while(mins >= 0)
+    {
+        --secs;
+        
+        if(mins > 0 && secs == 0)
+        {
+            --mins;
+            secs += 60;
+            
+            while(mins == 0 && secs > 0)
+            {
+                --secs;
+            }
+        }
+        else if(mins == 0 && secs < 0)
+        {
+            std::cout << "Massage Complete\n";
+            break;
+        }
+        std::cout << mins << " : " << secs << "\n";
+    }
     return msgDuration;
 }
 
@@ -209,6 +252,7 @@ struct CollegeStudent
 {
     int numOfEnrolledClasses {7};
     double gpa {3.64};
+    int booksRead = 0;
     std::string studentName = "Student's Name";
     std::string subjectMajor;
     std::string expectedGraduationDate;
@@ -219,6 +263,21 @@ struct CollegeStudent
     void watchTelevision(CollegeStudent newStudent);
     void danceToMusic();
     void printCollegeStudent();
+    int readBook(int totalPages)
+    {
+        for(int i = 1; i <= totalPages; ++i)
+        {
+            std::cout << "Page " << i << " complete\n";
+            
+            if(i == totalPages)
+            {
+                std::cout << "book complete\n";
+                ++booksRead;
+            }
+        }
+        std::cout << "congratulations!! you have finished book number: " << booksRead << " \n";
+        return booksRead;   
+    }
 };
 
 CollegeStudent::CollegeStudent() :
@@ -260,6 +319,7 @@ struct PetCat
     int ageOfCat;
     std::string nameOfPetCat;
     bool maleGender;
+    bool catHungry = true;
 
     struct CatCollar
     {
@@ -268,6 +328,7 @@ struct PetCat
         bool isWaterProof = true;
         bool hasCollarBuckle;
         int numOfHolesForBuckle;
+        int leashLength;
 
         CatCollar();
 
@@ -275,6 +336,21 @@ struct PetCat
         void attachLeash();
         int tightenCollar(int bucklePosition);
         void printCatCollarVars();
+        int leashExtend(int desiredLength)
+        {
+            if(desiredLength > leashLength)
+            {
+                std::cout << "leash isn't that long!\n";
+            }
+            else
+            {
+                for(int i = 0; i < desiredLength; ++i)
+                {
+                    std::cout << "extending to " << i << " \n";
+                }
+            }
+            return desiredLength;
+        }
     };
 
     PetCat();
@@ -284,11 +360,31 @@ struct PetCat
     void scratchVisitors();
     CatCollar replacementCollar;
     void printPetCatVars();
+    void catEatFood()
+    {
+        int nomNomNom = 0;
+        
+        if(catHungry == true)
+        {
+            while(catHungry == true && nomNomNom <= 3)
+            {
+                ++nomNomNom;
+                std::cout << "nom nom nom... im still hungry!\n";
+                
+                if(nomNomNom > 3)
+                {
+                    std::cout << "Meow... I'm Full now.\n";
+                    catHungry = false;
+                }   
+            }
+        }
+    }
 };
 
 PetCat::CatCollar::CatCollar() :
 hasCollarBuckle(true),
-numOfHolesForBuckle(4)
+numOfHolesForBuckle(4),
+leashLength(10)
 {
     std::cout << "CatCollar is being constructed!" << std::endl; 
 }
@@ -316,7 +412,10 @@ int PetCat::CatCollar::tightenCollar(int bucklePosition)
         --bucklePosition;
         std::cout << "collar has been tightened\n";
     }
-    std::cout << "This collar only has " << numOfHolesForBuckle << " please inut a whole number smaller or equal to that\n";
+    else
+    {
+        std::cout << "This collar only has " << numOfHolesForBuckle << " please inut a whole number smaller or equal to that\n";
+    }
     return bucklePosition;
 }
 
@@ -370,11 +469,14 @@ struct Human
     std::string ethnicity = "Black/African American";
     int dateOfBirth;
     std::string bloodType;
+    int amountOfBlood;
+    bool isAngry = false;
 
     struct HealthStatus
     {
         int numOfHealthComplications {0};
         bool chronicDiseasesPresent {false};
+        bool goToAppointment = false;
         std::string dateOfLastCheckup = "23 Feburary 2022";
         float bodyMassIndex;
         std::string bloodPressureLevel;
@@ -385,13 +487,24 @@ struct Human
         void developeHealthCondition(bool isHereditary, std::string knownSymptoms, std::string conditionName);
         void scheduleCheckUp(std::string returnDate, bool sameDoctor);
         void printHealthStatusVars();
+        int countdownNextVisit(int daysSinceLastVisit)
+        {
+            int daysLeft = 365 - daysSinceLastVisit;
+            
+            for(int i = daysLeft; i > 0; --i)
+            {
+                std::cout << i << " days left until next visit\n";
+            }
+            goToAppointment = true;
+            return daysLeft;
+        }
     };
 
     Human();
 
     void visitDoctor(HealthStatus updateHealthStatus);
     void goToSleep(int howLong);
-    void donateBlood(bool giveLeftArm);
+    void donateBlood(Human girlfriend, bool giveLeftArm);
     HealthStatus healthStatus;
     void printHumanVars();
 };
@@ -405,7 +518,8 @@ bloodPressureLevel("120/83 mmHg")
 
 Human::Human() :
 dateOfBirth(12181989),
-bloodType("O Negative")
+bloodType("O Negative"),
+amountOfBlood(5000) //mL
 {
     std::cout << "Human being constructed!" << std::endl;
 }
@@ -447,6 +561,7 @@ void Human::visitDoctor(HealthStatus updateHealthStatus)
     std::cout << "Date Of Last Check-Up: " << updateHealthStatus.dateOfLastCheckup << " \n";
     std::cout << "Number of Complications: " << updateHealthStatus.numOfHealthComplications << " \n";
     //here I would replace dateOfLastCheckup with todays date.
+    updateHealthStatus.goToAppointment = false;
 }
 
 void Human::goToSleep(int howLong)
@@ -454,7 +569,7 @@ void Human::goToSleep(int howLong)
     std::cout << nameOfHuman << " is going to get " << howLong << " hours of sleep!\n";
 }
 
-void Human::donateBlood(bool giveLeftArm)
+void Human::donateBlood(Human girlfriend, bool giveLeftArm)
 {
     if(giveLeftArm == true)
     {
@@ -464,6 +579,15 @@ void Human::donateBlood(bool giveLeftArm)
     {
         std::cout << "you have decided to donate from your right arm\n";
     }
+    int bloodDonated = 0;
+    
+    while(bloodDonated < 500 || girlfriend.amountOfBlood < 4000)
+    {
+        bloodDonated += 100;
+        girlfriend.amountOfBlood -= 100;
+        std::cout << "still donating: " << bloodDonated << "/500... hang in there.\n";
+    }
+    std::cout << "all done, go home\n";
 }
 
 void Human::printHumanVars()
@@ -488,6 +612,22 @@ struct SocialStatus
     void attractMoreFriends(bool rejectNewFriend);
     void getExclusiveDeals();
     void bypassSocietalNorms();
+    double capitalGainsFromInvestment(double moneyInvested, int forHowLong)
+    {
+        std::cout << "your current balance before the investment is: " << netWorth << " \n";
+        double interest = moneyInvested * 0.12;
+        int investmentTerm = 0;
+        
+        while(investmentTerm < forHowLong)
+        {
+            moneyInvested += interest;
+            std::cout << moneyInvested << " added to your bank account\n";
+            netWorth += moneyInvested;
+            ++investmentTerm;
+        }
+        std::cout << "your new balance is: " << netWorth << " \n";
+        return netWorth;
+    }
     void printSocialStatusVars();
 };
 
@@ -533,7 +673,7 @@ struct PhysicalAttribrutes
 {
     int amountOfLimbs {4};
     std::string currentEyeColor {"brown"};
-    float currentHieght = 5.7f;
+    float currentHeight = 4.7f;
     float currentWeight;
     std::string currentHairColor;
 
@@ -543,6 +683,22 @@ struct PhysicalAttribrutes
     float increaseWeight(float addedPounds); //returns current weight + amount of lbs added.
     void loseLimb();
     void printPhysicalAttribrutesVars();
+    float hitPuberty(Human newHuman, PhysicalAttribrutes newPhysAtt)
+    {
+        if(newHuman.ageInYears < 16)
+        {
+            while(newPhysAtt.currentHeight <= 5.0f)
+            {
+                newPhysAtt.currentHeight += 0.1f;
+                std::cout << "you grew to " << newPhysAtt.currentHeight << " wow you're getting tall!\n";
+            }
+        }
+        else
+        {
+            std::cout << "you are to old to go through puberty\n";
+        }
+        return newPhysAtt.currentHeight;
+    }
 };
 
 PhysicalAttribrutes::PhysicalAttribrutes() :
@@ -573,7 +729,7 @@ void PhysicalAttribrutes::printPhysicalAttribrutesVars()
 {
     std::cout << "amountOfLimbs: " << amountOfLimbs << " \n";
     std::cout << "currentEyeColor: " << currentEyeColor << " \n";
-    std::cout << "currentHieght: " << currentHieght << "\n";
+    std::cout << "currentHeight: " << currentHeight << "\n";
     std::cout << "currentWeight:  " << currentWeight << "\n";
     std::cout << "currentHairColor: " << currentHairColor << "\n\n";  
 }
@@ -591,6 +747,16 @@ struct Education
     std::string addDegree(std::string newestDegree); //returns newly added degree
     void dropOutOfSchool();
     std::string changeMajor(std::string whichMajor, std::string degreeLevel); //returns options for majors in accordance with associated degree level
+    void attainNewDegree(int howLongIsProgram, Education moreEducation)
+    {
+        for(int yrsComplete = 0; yrsComplete <= howLongIsProgram; ++yrsComplete)
+        {
+            int yrsLeft = howLongIsProgram - yrsComplete;
+            std::cout << "you've completed " << yrsComplete << " you have " << yrsLeft << " until program is complete\n";
+            ++moreEducation.numOfYearsAttended;
+        }
+        std::cout << "New degree compelete!\n";
+    }
     void printEducationVars();
 };
 
@@ -631,12 +797,14 @@ struct Home
     int numOfRooms;
     double propertySize;
     std::string homeAddress = "123 Main St, Orange Grove CA, 34567";
+    std::string homeColor = "New Color";
     double propertyValue {375400.00};
     int numOfAppliances {10};
 
     Home();
 
-    void appreaciateInValue();
+    void appreaciateInValue(int years);
+    std::string newPaintColor(std::string whatColor);
     void addRoomToHouse();
     std::string deteriorateOverTime(std::string brokenItem); //display what needs to be fixed.
     void printHomeVars();
@@ -649,9 +817,19 @@ propertySize(1373.56)
     std::cout << "Home being constructed!" << std::endl;
 }
 
-void Home::appreaciateInValue()
+std::string Home::newPaintColor(std::string whatColor)
 {
-    
+    homeColor = whatColor;
+    return whatColor;
+}
+
+void Home::appreaciateInValue(int years)
+{
+    for(int i = 0; i < years; ++i)
+    {
+        propertyValue += 10560.95;
+        std::cout << "your home's value went up to" << propertyValue << " \n";
+    }
 }
 
 void Home::addRoomToHouse()
@@ -688,6 +866,27 @@ struct Girlfriend
     std::string planDinnerDate(std::string whatRestaurant, std::string whenToGo, std::string whatTime); //should return prompt controlled by if statements
     void presentIdeas(Human girlfriend);
     bool buildFurniture (Human girlfriend, bool carpetrySkills);
+    int bringUpIssue(Human girlfriend, int timesAsked, std::string issueName)
+    {
+        while(timesAsked < 3)
+        {
+            girlfriend.isAngry = false;
+            std::cout << "hey just reminding you to address the " << issueName << " \n";
+            ++timesAsked;
+        }
+        while(timesAsked < 10)
+        {
+            girlfriend.isAngry = true;
+            std::cout << "Are you even going to do anything about the " << issueName << " \n";
+            ++timesAsked;
+        }
+        if(timesAsked > 10)
+        {
+            std::cout << "I give up, Im not wasting my energy...\n";
+            girlfriend.isAngry = false;
+        }
+        return timesAsked;
+    }
 };
 
 Girlfriend::Girlfriend()
@@ -724,81 +923,93 @@ int main()
 {
     Example::main();
 
-    Television samsung;
+    Television samsung; //done
     samsung.decreaseBrightness(98);
     samsung.changeDisplaySettings();
     samsung.increaseVolume(37);
+    samsung.scanForChannels(191);
     samsung.printTelevisionVars();
 
-    MassageChair osakiOS4000T;
+    MassageChair osakiOS4000T; //done
     osakiOS4000T.giveMassage(true);
-    osakiOS4000T.displayTimer(60.00);
+    osakiOS4000T.displayTimer(1);
     osakiOS4000T.playBackgroundSound();
     osakiOS4000T.printMassageChairVars();
 
-    CollegeStudent rickSanchez;
+    CollegeStudent rickSanchez; //done
     rickSanchez.studentName = "Rick Sanchez";
+    rickSanchez.booksRead = 0;
     rickSanchez.attendStudyHall();
     rickSanchez.danceToMusic();
     rickSanchez.watchTelevision(rickSanchez);
+    rickSanchez.readBook(10);
     rickSanchez.printCollegeStudent();
 
-    PetCat::CatCollar friscoBreakaway;
+    PetCat::CatCollar friscoBreakaway; //done
     friscoBreakaway.repelFleas(10, "12/12/2012");
     friscoBreakaway.attachLeash();
     friscoBreakaway.tightenCollar(3);
+    friscoBreakaway.leashExtend(8);
     friscoBreakaway.printCatCollarVars();
     
-    PetCat doris;
+    PetCat doris; //done
     doris.knockOverObjects();
     doris.scratchVisitors();
     doris.takeOffCollar(friscoBreakaway);
+    doris.catEatFood();
     doris.printPetCatVars();
     
-    Human::HealthStatus may5thUpdate;
+    Human::HealthStatus may5thUpdate; //done
     may5thUpdate.contractSTD("Cold Sore", "10/28/2021");
     may5thUpdate.developeHealthCondition(false, "small blisters around body", "chickenpox");
     may5thUpdate.scheduleCheckUp("11/22/2024", true);
+    may5thUpdate.countdownNextVisit(355);
     may5thUpdate.printHealthStatusVars();
 
-    Human julianneCabour;
+    Human julianneCabour; //done
     julianneCabour.nameOfHuman = "Julianne Cabour";
+    julianneCabour.ageInYears = 13;
     julianneCabour.goToSleep(10);
-    julianneCabour.donateBlood(false);
+    julianneCabour.donateBlood(julianneCabour, false);
     julianneCabour.visitDoctor(may5thUpdate);
     julianneCabour.printHumanVars();
 
-    SocialStatus upperClass;
+    SocialStatus upperClass; //done
     upperClass.attractMoreFriends(false);
     upperClass.bypassSocietalNorms();
     upperClass.getExclusiveDeals();
+    upperClass.capitalGainsFromInvestment(100, 10);
     upperClass.printSocialStatusVars();
 
-    PhysicalAttribrutes weak;
+    PhysicalAttribrutes weak; //done
+    weak.currentHeight = 4.9f;
     weak.increaseWeight(7.0);
     weak.loseLimb();
     weak.selectHairColor("Purple");
+    weak.hitPuberty(julianneCabour, weak);
     weak.printPhysicalAttribrutesVars();
     
-    Education graphicDesigner;
+    Education graphicDesigner; //done
     graphicDesigner.changeMajor("Business", "BA");
     graphicDesigner.addDegree("Computer Science");
     graphicDesigner.dropOutOfSchool();
+    graphicDesigner.attainNewDegree(6, graphicDesigner);
     graphicDesigner.printEducationVars();
 
-    Home residence;
+    Home residence; //done
     residence.addRoomToHouse();
-    residence.appreaciateInValue();
+    residence.appreaciateInValue(5);
     residence.deteriorateOverTime("roofing");
+    residence.newPaintColor("white");
     residence.printHomeVars();
 
-    Girlfriend babe;
+    Girlfriend babe; //done
     babe.buildFurniture(julianneCabour, false);
     babe.presentIdeas(julianneCabour);
     babe.planDinnerDate("Arbys", "05/08/2023", "07:30");
+    babe.bringUpIssue(julianneCabour, 1, "oil change");
 
     std::cout << "home address: " << residence.homeAddress << "\n";
     std::cout << "Social Status Occupation: " << upperClass.occupation << "\n";
-    
     std::cout << "good to go!" << std::endl;
 }
